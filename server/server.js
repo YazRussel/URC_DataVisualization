@@ -334,7 +334,7 @@ const CLIENT_DIST = path.join(__dirname, "../client/dist");
 if (fs.existsSync(CLIENT_DIST)) {
   app.use(express.static(CLIENT_DIST));
   // Let React Router handle any non-API path
-  app.get("*", (req, res) => {
+  app.get("(.*)", (req, res) => {
     res.sendFile(path.join(CLIENT_DIST, "index.html"));
   });
 }
