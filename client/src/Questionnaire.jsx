@@ -586,7 +586,7 @@
 // }
 
 //newer
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 const TASKS = [
   // -----------------------
@@ -753,50 +753,124 @@ const TASKS = [
   }
 ];
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/** Time allowed per question (seconds). */
+const TIME_LIMIT = 60;
+
+/** Grade an answer against the task's correct value. Returns true/false. */
+function calcIsCorrect(task, answer) {
+  if (answer === null) return false; // timed out counts as wrong
+  if (task.type === "single") return answer === task.correct;
+  if (task.type === "top_k" || task.type === "pick_n") {
+    if (!Array.isArray(answer) || !Array.isArray(task.correct)) return false;
+    return [...answer].sort().join(",") === [...task.correct].sort().join(",");
+  }
+  if (task.type === "full_ranking") {
+    if (!Array.isArray(answer) || !Array.isArray(task.correct)) return false;
+    return JSON.stringify(answer) === JSON.stringify(task.correct);
+  }
+  return null;
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
+
 export default function Questionnaire() {
   const [currentTask, setCurrentTask] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(60);
+  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [results, setResults] = useState([]);
+  const [saveStatus, setSaveStatus] = useState("idle"); // "idle"|"saving"|"saved"|"error"
 
   // ranking UI states
   const [multiSelected, setMultiSelected] = useState([]);
   const [rankOrder, setRankOrder] = useState([]);
 
+  // ── Dataset tracking refs ──────────────────────────────────────────────────
+  const participantId = useRef(crypto.randomUUID());
+  const startedAt = useRef(new Date().toISOString());
+  const taskStartTime = useRef(Date.now());   // wall-clock when task began
+  const taskTimeLimit = useRef(TIME_LIMIT);   // time limit for current task
+
+  // Reset task-level refs whenever the task index changes
   useEffect(() => {
     if (currentTask >= TASKS.length) return;
     const task = TASKS[currentTask];
+
+    taskStartTime.current = Date.now();
+    taskTimeLimit.current = TIME_LIMIT;
 
     if (task.type === "top_k" || task.type === "pick_n") setMultiSelected([]);
     if (task.type === "full_ranking") setRankOrder(task.options);
   }, [currentTask]);
 
+  // Countdown timer
   useEffect(() => {
     if (currentTask >= TASKS.length) return;
 
     if (timeLeft === 0) {
-      submitAnswer(null);
+      submitAnswer(null); // auto-submit on timeout
       return;
     }
 
     const timer = setTimeout(() => setTimeLeft(t => t - 1), 1000);
     return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft, currentTask]);
 
+  // ── POST results to server ─────────────────────────────────────────────────
+  const postResults = async (allResults) => {
+    setSaveStatus("saving");
+    try {
+      const res = await fetch("/api/responses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          participantId: participantId.current,
+          startedAt: startedAt.current,
+          finishedAt: new Date().toISOString(),
+          results: allResults
+        })
+      });
+      const data = await res.json();
+      if (data.ok) setSaveStatus("saved");
+      else setSaveStatus("error");
+    } catch {
+      setSaveStatus("error");
+    }
+  };
+
+  // ── Record & advance ───────────────────────────────────────────────────────
   const submitAnswer = (answer) => {
     const task = TASKS[currentTask];
+    const timedOut = answer === null;
+
+    // Elapsed seconds since the task was shown (1 decimal place)
+    const reactionTimeS = +(
+      (Date.now() - taskStartTime.current) / 1000
+    ).toFixed(1);
 
     const result = {
-      id: task.id,
-      type: task.type || "single",
-      question: task.question,
-      selected: answer,
-      correct: task.type === "single" ? answer === task.correct : null,
-      reactionTime: 30 - timeLeft
+      taskId:         task.id,
+      type:           task.type || "single",
+      question:       task.question,
+      selectedAnswer: answer,
+      correctAnswer:  task.correct,
+      isCorrect:      calcIsCorrect(task, answer),
+      reactionTimeS,
+      timedOut,
+      timeLimitS:     taskTimeLimit.current
     };
 
-    setResults(prev => [...prev, result]);
+    const newResults = [...results, result];
+    setResults(newResults);
     setCurrentTask(prev => prev + 1);
-    setTimeLeft(30);
+    setTimeLeft(TIME_LIMIT);
+
+    // If this was the last task, send the dataset to the server
+    if (currentTask + 1 >= TASKS.length) {
+      console.log("Final results:", newResults);
+      postResults(newResults);
+    }
   };
 
   const handleSingle = (option) => submitAnswer(option);
@@ -821,7 +895,6 @@ export default function Questionnaire() {
   };
 
   if (currentTask >= TASKS.length) {
-    console.log("Results:", results);
     return (
       <div style={page}>
         <div style={topBar}>
@@ -832,7 +905,23 @@ export default function Questionnaire() {
         <div style={centerWrap}>
           <div style={card}>
             <h2 style={title}>Experiment Complete</h2>
-            <p style={sub}>Your answers were recorded. Check the console for results.</p>
+            <p style={sub}>Thank you for participating!</p>
+            {saveStatus === "saving" && (
+              <p style={{ ...sub, marginTop: 12, color: "#64748b" }}>Saving your responses…</p>
+            )}
+            {saveStatus === "saved" && (
+              <p style={{ ...sub, marginTop: 12, color: "#16a34a" }}>
+                ✓ Responses saved to the dataset.
+              </p>
+            )}
+            {saveStatus === "error" && (
+              <p style={{ ...sub, marginTop: 12, color: "#dc2626" }}>
+                ⚠ Could not reach the server. Results are logged to the console.
+              </p>
+            )}
+            <p style={{ ...sub, marginTop: 8, fontSize: 12, color: "#94a3b8" }}>
+              Participant ID: {participantId.current}
+            </p>
           </div>
         </div>
       </div>

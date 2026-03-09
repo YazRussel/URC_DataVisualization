@@ -90,6 +90,52 @@ function Home({ openChart, openQuestionnaire }) {
           Open Questionnaire (new window)
         </button>
       </div>
+
+      {/* Dataset export & management */}
+      <hr style={{ margin: "32px 0", borderColor: "#e5e7eb" }} />
+      <h2 style={{ marginBottom: 8 }}>Results</h2>
+      <p style={{ marginBottom: 16, color: "#475569" }}>
+        Download all collected responses as an Excel file (3 sheets: raw data, per-task summary, per-participant summary).
+      </p>
+      <div style={{ display: "flex", gap: "14px", alignItems: "center", flexWrap: "wrap" }}>
+        <a href="/api/responses/export" download>
+          <button style={{
+            padding: "10px 20px",
+            background: "#16a34a",
+            color: "#fff",
+            border: "none",
+            borderRadius: 8,
+            cursor: "pointer",
+            fontWeight: 700,
+            fontSize: 15
+          }}>
+            Download Results (.xlsx)
+          </button>
+        </a>
+
+        <button
+          onClick={() => {
+            if (window.confirm("Delete ALL responses? This cannot be undone.")) {
+              fetch("/api/responses/all", { method: "DELETE" })
+                .then(r => r.json())
+                .then(d => alert(d.ok ? "All responses deleted." : "Error: " + d.error))
+                .catch(() => alert("Could not reach server."));
+            }
+          }}
+          style={{
+            padding: "10px 20px",
+            background: "#dc2626",
+            color: "#fff",
+            border: "none",
+            borderRadius: 8,
+            cursor: "pointer",
+            fontWeight: 700,
+            fontSize: 15
+          }}
+        >
+          Clear All Responses
+        </button>
+      </div>
     </div>
   );
 }

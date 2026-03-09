@@ -8,7 +8,7 @@
 //   const [topN, setTopN] = useState(25);
 
 //   useEffect(() => {
-//     fetch("http://localhost:3001/api/table5")
+//     fetch("/api/table5")
 //       .then(res => res.json())
 //       .then(setData);
 //   }, []);
@@ -214,7 +214,7 @@ export default function RankedBarChart() {
   const [sortMode, setSortMode] = useState("normal"); // "normal" | "alpha"
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/table5")
+    fetch("/api/table5")
       .then(res => res.json())
       .then(setData);
   }, []);
