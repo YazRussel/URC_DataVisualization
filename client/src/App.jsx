@@ -48,12 +48,13 @@ import Questionnaire from "./Questionnaire";
 
 export default function App() {
   const openChart = () => window.open("/chart", "_blank", "width=1200,height=800");
+  const openChoropleth = () => window.open("/choropleth/", "_blank", "width=1200,height=800");
   const openQuestionnaire = () => window.open("/questionnaire", "_blank", "width=900,height=700");
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home openChart={openChart} openQuestionnaire={openQuestionnaire} />} />
+        <Route path="/" element={<Home openChart={openChart} openChoropleth={openChoropleth} openQuestionnaire={openQuestionnaire} />} />
         <Route path="/chart" element={<RankedBarChart />} />
         <Route path="/questionnaire" element={<Questionnaire />} />
 
@@ -64,30 +65,38 @@ export default function App() {
   );
 }
 
-function Home({ openChart, openQuestionnaire }) {
+function Home({ openChart, openChoropleth, openQuestionnaire }) {
   return (
     <div style={{ padding: "50px" }}>
       <h1>Experiment Launcher</h1>
 
-      <div style={{ display: "flex", gap: "14px", marginTop: "18px" }}>
+      <div style={{ display: "flex", gap: "14px", marginTop: "18px", flexWrap: "wrap" }}>
         {/* open in same tab */}
         <Link to="/chart">
-          <button style={{ padding: "10px 16px" }}>Open Chart (same tab)</button>
+          <button style={{ padding: "10px 16px" }}>Ranked Bar Chart (same tab)</button>
         </Link>
 
+        <a href="/choropleth/" target="_blank" rel="noreferrer">
+          <button style={{ padding: "10px 16px" }}>Choropleth Map (same tab)</button>
+        </a>
+
         <Link to="/questionnaire">
-          <button style={{ padding: "10px 16px" }}>Open Questionnaire (same tab)</button>
+          <button style={{ padding: "10px 16px" }}>Questionnaire (same tab)</button>
         </Link>
       </div>
 
-      <div style={{ display: "flex", gap: "14px", marginTop: "18px" }}>
+      <div style={{ display: "flex", gap: "14px", marginTop: "18px", flexWrap: "wrap" }}>
         {/* open in new window */}
         <button onClick={openChart} style={{ padding: "10px 16px" }}>
-          Open Chart (new window)
+          Ranked Bar Chart (new window)
+        </button>
+
+        <button onClick={openChoropleth} style={{ padding: "10px 16px" }}>
+          Choropleth Map (new window)
         </button>
 
         <button onClick={openQuestionnaire} style={{ padding: "10px 16px" }}>
-          Open Questionnaire (new window)
+          Questionnaire (new window)
         </button>
       </div>
 
