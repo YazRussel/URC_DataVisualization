@@ -45,14 +45,14 @@ const TASKS = [
     type: "single",
     question: "Between France and Indonesia, which sends more international students?",
     options: ["France", "Indonesia"],
-    correct: "Indonesia"
+    correct: "France"
   },
   // {
   //   id: 7,
   //   type: "single",
   //   question: "Between China and India, which sends more international students?",
   //   options: ["China", "India"],
-  //   correct: "China"
+  //   correct: "India"
   // },
   {
     id: 3,
@@ -115,9 +115,9 @@ const TASKS = [
   {
     id: 7,
     type: "single",
-    question: "Which country is the fourth highest among the following seven countries?",
-    options: ["United Kingdom", "Japan", "Mexico", "France", "India", "Ghana", "Colombia"],
-    correct: "United Kingdom"
+    question: "Which country is the second highest among the following four countries?",
+    options: ["United Kingdom", "Japan", "Mexico", "France"],
+    correct: "Japan"
   },
 
   // -----------------------
