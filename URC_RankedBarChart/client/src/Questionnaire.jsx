@@ -1,590 +1,3 @@
-// import React, { useState, useEffect } from "react";
-
-// const TASKS = [
-//   // -----------------------
-//   // Pairwise Comparison Tasks
-//   // -----------------------
-//   {
-//     id: 1,
-//     question: "Between Vietnam and Taiwan, which sends more international students?",
-//     options: ["Vietnam", "Taiwan"],
-//     correct: "Vietnam"
-//   },
-//   {
-//     id: 2,
-//     question: "Between Spain and Turkey/Türkiye, which sends more international students?",
-//     options: ["Spain", "Turkey/Türkiye"],
-//     correct: "Turkey/Türkiye"
-//   },
-//   {
-//     id: 3,
-//     question: "Between Nepal and Bangladesh, which sends more international students?",
-//     options: ["Nepal", "Bangladesh"],
-//     correct: "Nepal"
-//   },
-//   {
-//     id: 4,
-//     question: "Between Hong Kong and Italy, which sends more international students?",
-//     options: ["Hong Kong", "Italy"],
-//     correct: "Italy"
-//   },
-//   {
-//     id: 5,
-//     question: "Between Germany and Spain, which sends more international students?",
-//     options: ["Germany", "Spain"],
-//     correct: "Spain"
-//   },
-//   {
-//     id: 6,
-//     question: "Between France and Indonesia, which sends more international students?",
-//     options: ["France", "Indonesia"],
-//     correct: "Indonesia"
-//   },
-//   {
-//     id: 7,
-//     question: "Between China and India, which sends more international students?",
-//     options: ["China", "India"],
-//     correct: "China"
-//   },
-//   {
-//     id: 8,
-//     question: "Between Ghana and Iran, which sends more international students?",
-//     options: ["Ghana", "Iran"],
-//     correct: "Ghana"
-//   },
-
-//   // -----------------------
-//   // Threshold / Yes-No Tasks
-//   // -----------------------
-//   {
-//     id: 9,
-//     question: "Does Taiwan send more than 30,000 international students to the United States?",
-//     options: ["Yes", "No"],
-//     correct: "No"
-//   },
-//   {
-//     id: 10,
-//     question: "Which country sends more than 60,000 international students to the United States?",
-//     options: ["China", "India"],
-//     correct: "China"
-//   },
-//   {
-//     id: 11,
-//     question: "Which country sends more than 40,000 international students to the United States?",
-//     options: ["South Korea", "Nigeria", "India"],
-//     correct: "India"
-//   },
-//   {
-//     id: 12,
-//     question: "Which country sends fewer than 10,000 international students to the United States?",
-//     options: ["Turkey/Türkiye", "Ghana", "Colombia", "Canada"],
-//     correct: "Turkey/Türkiye"
-//   },
-//   {
-//     id: 13,
-//     question: "Which country sends more than 20,000 international students to the United States?",
-//     options: ["Spain", "United Kingdom", "Nigeria", "Brazil"],
-//     correct: "Nigeria"
-//   },
-//   {
-//     id: 14,
-//     question: "e.	Which of the following countries sends fewer than 5,000 international students to the United States? ",
-//     options: ["Mexico", "France", "Iran", "None"],
-//     correct: "None"
-//   },
-
-//   // -----------------------
-//   // Ranking-style (single answer) Tasks
-//   // -----------------------
-//   {
-//     id: 15,
-//     question: "Which country is the fourth highest among the following seven countries?",
-//     options: ["United Kingdom", "Japan", "Mexico", "France", "India", "Ghana", "Colombia"],
-//     correct: "United Kingdom"
-//   },
-//   {
-//     id: 16,
-//     question: "From this list, which one is the highest by enrollment?",
-//     options: ["Taiwan", "Brazil", "Saudi Arabia", "Turkey/Türkiye", "Spain"],
-//     correct: "Taiwan"
-//   },
-//   {
-//     id: 17,
-//     question: "Rank check: Which one is the highest among these three?",
-//     options: ["Germany", "Spain", "Turkey/Türkiye"],
-//     correct: "Turkey/Türkiye"
-//   },
-
-//   // -----------------------
-//   // Pattern Tasks (forced-choice)
-//   // -----------------------
-//   {
-//     id: 18,
-//     question: "Which country is closest to the average enrollment level among these five countries?",
-//     options: ["Vietnam", "Taiwan", "Nepal", "Spain", "Germany"],
-//     correct: "Nepal"
-//   },
-//   {
-//     id: 19,
-//     question: "Are high-enrollment countries concentrated in one region or spread across multiple regions?",
-//     options: ["Mostly Asia", "Mostly Europe", "Evenly spread"],
-//     correct: "Mostly Asia"
-//   }
-// ];
-
-// export default function Questionnaire() {
-//   const [currentTask, setCurrentTask] = useState(0);
-//   const [timeLeft, setTimeLeft] = useState(30);
-//   const [results, setResults] = useState([]);
-
-//   useEffect(() => {
-//     if (currentTask >= TASKS.length) return;
-
-//     if (timeLeft === 0) {
-//       nextTask(null);
-//       return;
-//     }
-
-//     const timer = setTimeout(() => setTimeLeft(t => t - 1), 1000);
-//     return () => clearTimeout(timer);
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [timeLeft, currentTask]);
-
-//   const nextTask = (answer) => {
-//     const task = TASKS[currentTask];
-
-//     const result = {
-//       question: task.question,
-//       selected: answer,
-//       correct: answer === task.correct,
-//       reactionTime: 30 - timeLeft
-//     };
-
-//     setResults(prev => [...prev, result]);
-//     setCurrentTask(prev => prev + 1);
-//     setTimeLeft(30);
-//   };
-
-//   if (currentTask >= TASKS.length) {
-//     console.log("Results:", results);
-//     return <h2 style={{ padding: "40px" }}>Experiment Complete</h2>;
-//   }
-
-//   const task = TASKS[currentTask];
-
-//   return (
-//     <div style={{ padding: "40px" }}>
-//       <h2>Time Left: {timeLeft}s</h2>
-//       <h3>{task.question}</h3>
-
-//       {task.options.map(option => (
-//         <button
-//           key={option}
-//           onClick={() => nextTask(option)}
-//           style={{ margin: "10px", padding: "10px 20px" }}
-//         >
-//           {option}
-//         </button>
-//       ))}
-//     </div>
-//   );
-// }
-
-
-//new
-// import React, { useState, useEffect } from "react";
-
-// const TASKS = [
-//   // -----------------------
-//   // Pairwise Comparison Tasks (single choice)
-//   // -----------------------
-//   {
-//     id: 1,
-//     type: "single",
-//     question: "Between Vietnam and Taiwan, which sends more international students?",
-//     options: ["Vietnam", "Taiwan"],
-//     correct: "Vietnam"
-//   },
-//   {
-//     id: 2,
-//     type: "single",
-//     question: "Between Spain and Turkey/Türkiye, which sends more international students?",
-//     options: ["Spain", "Turkey/Türkiye"],
-//     correct: "Turkey/Türkiye"
-//   },
-//   {
-//     id: 3,
-//     type: "single",
-//     question: "Between Nepal and Bangladesh, which sends more international students?",
-//     options: ["Nepal", "Bangladesh"],
-//     correct: "Nepal"
-//   },
-//   {
-//     id: 4,
-//     type: "single",
-//     question: "Between Hong Kong and Italy, which sends more international students?",
-//     options: ["Hong Kong", "Italy"],
-//     correct: "Italy"
-//   },
-//   {
-//     id: 5,
-//     type: "single",
-//     question: "Between Germany and Spain, which sends more international students?",
-//     options: ["Germany", "Spain"],
-//     correct: "Spain"
-//   },
-//   {
-//     id: 6,
-//     type: "single",
-//     question: "Between France and Indonesia, which sends more international students?",
-//     options: ["France", "Indonesia"],
-//     correct: "Indonesia"
-//   },
-//   {
-//     id: 7,
-//     type: "single",
-//     question: "Between China and India, which sends more international students?",
-//     options: ["China", "India"],
-//     correct: "China"
-//   },
-//   {
-//     id: 8,
-//     type: "single",
-//     question: "Between Ghana and Iran, which sends more international students?",
-//     options: ["Ghana", "Iran"],
-//     correct: "Ghana"
-//   },
-
-//   // -----------------------
-//   // Threshold / Yes-No (single choice)
-//   // -----------------------
-//   {
-//     id: 9,
-//     type: "single",
-//     question: "Does Taiwan send more than 30,000 international students to the United States?",
-//     options: ["Yes", "No"],
-//     correct: "No"
-//   },
-//   {
-//     id: 10,
-//     type: "single",
-//     question: "Which country sends more than 60,000 international students to the United States?",
-//     options: ["China", "India"],
-//     correct: "China"
-//   },
-//   {
-//     id: 11,
-//     type: "single",
-//     question: "Which country sends more than 40,000 international students to the United States?",
-//     options: ["Iran", "Nigeria", "India"],
-//     correct: "India"
-//   },
-//   {
-//     id: 12,
-//     type: "single",
-//     question: "Which country sends fewer than 10,000 international students to the United States?",
-//     options: ["Turkey/Türkiye", "Ghana", "Colombia", "Canada"],
-//     correct: "Turkey/Türkiye"
-//   },
-//   {
-//     id: 13,
-//     type: "single",
-//     question: "Which country sends more than 20,000 international students to the United States?",
-//     options: ["Spain", "United Kingdom", "Nigeria", "Brazil"],
-//     correct: "Nigeria"
-//   },
-//   {
-//     id: 14,
-//     type: "single",
-//     question:
-//       "Which of the following countries sends fewer than 5,000 international students to the United States?",
-//     options: ["Mexico", "France", "Iran", "None"],
-//     correct: "None"
-//   },
-
-//   // -----------------------
-//   // Ranking-style (single answer)
-//   // -----------------------
-//   {
-//     id: 15,
-//     type: "single",
-//     question: "Which country is the fourth highest among the following seven countries?",
-//     options: ["United Kingdom", "Japan", "Mexico", "France", "India", "Ghana", "Colombia"],
-//     correct: "United Kingdom"
-//   },
-//   // -----------------------
-//   // Pattern Tasks (single choice)
-//   // -----------------------
-//   {
-//     id: 16,
-//     type: "single",
-//     question: "Which country is closest to the average enrollment level among these five countries?",
-//     options: ["Vietnam", "Taiwan", "Nepal", "Spain", "Germany"],
-//     correct: "Nepal"
-//   },
-//   {
-//     id: 17,
-//     type: "single",
-//     question: "Are high-enrollment countries concentrated in one region or spread across multiple regions?",
-//     options: ["Mostly Asia", "Mostly Europe", "Evenly spread"],
-//     correct: "Mostly Asia"
-//   },
-
-//   // =========================================================
-//   // ✅ ADDED: Ranking tasks (multi-select + ordering)
-//   // =========================================================
-
-//   // 3(a) Top 3 out of 6
-//   {
-//     id: 18,
-//     type: "top_k",
-//     question: "From this list of six countries, select the top three by enrollment.",
-//     options: ["Nepal", "Vietnam", "South Korea", "Canada", "China", "India"],
-//     k: 3,
-//     correct: ["South Korea", "China", "India"] // optional for now (you can ignore grading later)
-//   },
-
-//   // 3(b) Second lowest (2 answers)
-//   {
-//     id: 19,
-//     type: "pick_n",
-//     question: "Which country is the second lowest among the following ten countries?",
-//     options: ["Iran", "Japan", "Mexico", "Italy", "Vietnam", "Colombia", "Bangladesh", "France", "Canada", "United Kingdom"],
-//     n: 2,
-//     correct: ["Italy", "France"] // optional for now
-//   },
-
-//   // 3(c) Full ranking (order all 5)
-//   {
-//     id: 20,
-//     type: "full_ranking",
-//     question: "Rank the following five countries from highest to lowest enrollment.",
-//     options: ["Brazil", "Turkey/Türkiye", "Saudi Arabia", "Spain", "Taiwan"],
-//     correct: ["Taiwan", "Brazil", "Saudi Arabia", "Turkey/Türkiye", "Spain"] // optional for now
-//   }
-// ];
-
-// export default function Questionnaire() {
-//   const [currentTask, setCurrentTask] = useState(0);
-//   const [timeLeft, setTimeLeft] = useState(30);
-//   const [results, setResults] = useState([]);
-
-//   // ranking UI states
-//   const [multiSelected, setMultiSelected] = useState([]); // for top_k and pick_n
-//   const [rankOrder, setRankOrder] = useState([]); // for full_ranking
-
-//   useEffect(() => {
-//     if (currentTask >= TASKS.length) return;
-
-//     const task = TASKS[currentTask];
-
-//     // initialize ranking state when task changes
-//     if (task.type === "top_k" || task.type === "pick_n") {
-//       setMultiSelected([]);
-//     }
-//     if (task.type === "full_ranking") {
-//       setRankOrder(task.options);
-//     }
-
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [currentTask]);
-
-//   useEffect(() => {
-//     if (currentTask >= TASKS.length) return;
-
-//     if (timeLeft === 0) {
-//       // submit "no answer" on timeout
-//       submitAnswer(null);
-//       return;
-//     }
-
-//     const timer = setTimeout(() => setTimeLeft(t => t - 1), 1000);
-//     return () => clearTimeout(timer);
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [timeLeft, currentTask]);
-
-//   const submitAnswer = (answer) => {
-//     const task = TASKS[currentTask];
-
-//     const result = {
-//       id: task.id,
-//       type: task.type || "single",
-//       question: task.question,
-//       selected: answer,
-//       // if you don't want grading yet, you can remove correct/score fields later
-//       correct:
-//         task.type === "single"
-//           ? answer === task.correct
-//           : null,
-//       reactionTime: 30 - timeLeft
-//     };
-
-//     setResults(prev => [...prev, result]);
-//     setCurrentTask(prev => prev + 1);
-//     setTimeLeft(30);
-//   };
-
-//   const handleSingle = (option) => submitAnswer(option);
-
-//   const toggleMulti = (option, limit) => {
-//     setMultiSelected(prev => {
-//       const has = prev.includes(option);
-//       if (has) return prev.filter(x => x !== option);
-//       if (prev.length >= limit) return prev; // don't allow more than limit
-//       return [...prev, option];
-//     });
-//   };
-
-//   const moveRank = (idx, dir) => {
-//     setRankOrder(prev => {
-//       const j = idx + dir;
-//       if (j < 0 || j >= prev.length) return prev;
-//       const copy = [...prev];
-//       const tmp = copy[idx];
-//       copy[idx] = copy[j];
-//       copy[j] = tmp;
-//       return copy;
-//     });
-//   };
-
-//   if (currentTask >= TASKS.length) {
-//     console.log("Results:", results);
-//     return <h2 style={{ padding: "40px" }}>Experiment Complete</h2>;
-//   }
-
-//   const task = TASKS[currentTask];
-//   const type = task.type || "single";
-
-//   return (
-//     <div style={{ padding: "40px" }}>
-//       <h2>Time Left: {timeLeft}s</h2>
-//       <h3>{task.question}</h3>
-
-//       {/* ------------------ SINGLE CHOICE ------------------ */}
-//       {type === "single" && (
-//         task.options.map(option => (
-//           <button
-//             key={option}
-//             onClick={() => handleSingle(option)}
-//             style={{ margin: "10px", padding: "10px 20px" }}
-//           >
-//             {option}
-//           </button>
-//         ))
-//       )}
-
-//       {/* ------------------ TOP K (multi-select) ------------------ */}
-//       {type === "top_k" && (
-//         <>
-//           <p>Select exactly {task.k}</p>
-//           {task.options.map(option => {
-//             const active = multiSelected.includes(option);
-//             return (
-//               <button
-//                 key={option}
-//                 onClick={() => toggleMulti(option, task.k)}
-//                 style={{
-//                   margin: "10px",
-//                   padding: "10px 20px",
-//                   border: active ? "2px solid #2563eb" : "1px solid #ccc",
-//                   background: active ? "#dbeafe" : "white"
-//                 }}
-//               >
-//                 {option}
-//               </button>
-//             );
-//           })}
-
-//           <div style={{ marginTop: 20 }}>
-//             <button
-//               onClick={() => submitAnswer(multiSelected)}
-//               disabled={multiSelected.length !== task.k}
-//               style={{ padding: "10px 20px" }}
-//             >
-//               Submit
-//             </button>
-//           </div>
-//         </>
-//       )}
-
-//       {/* ------------------ PICK N (multi-select) ------------------ */}
-//       {type === "pick_n" && (
-//         <>
-//           <p>Select exactly {task.n}</p>
-//           {task.options.map(option => {
-//             const active = multiSelected.includes(option);
-//             return (
-//               <button
-//                 key={option}
-//                 onClick={() => toggleMulti(option, task.n)}
-//                 style={{
-//                   margin: "10px",
-//                   padding: "10px 20px",
-//                   border: active ? "2px solid #2563eb" : "1px solid #ccc",
-//                   background: active ? "#dbeafe" : "white"
-//                 }}
-//               >
-//                 {option}
-//               </button>
-//             );
-//           })}
-
-//           <div style={{ marginTop: 20 }}>
-//             <button
-//               onClick={() => submitAnswer(multiSelected)}
-//               disabled={multiSelected.length !== task.n}
-//               style={{ padding: "10px 20px" }}
-//             >
-//               Submit
-//             </button>
-//           </div>
-//         </>
-//       )}
-
-//       {/* ------------------ FULL RANKING (order list) ------------------ */}
-//       {type === "full_ranking" && (
-//         <>
-//           <p>Order from highest → lowest (use ↑ ↓)</p>
-
-//           <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 520 }}>
-//             {rankOrder.map((item, idx) => (
-//               <div
-//                 key={item}
-//                 style={{
-//                   display: "flex",
-//                   alignItems: "center",
-//                   justifyContent: "space-between",
-//                   padding: "10px 12px",
-//                   border: "1px solid #ddd",
-//                   borderRadius: 8
-//                 }}
-//               >
-//                 <div style={{ fontWeight: 700 }}>
-//                   {idx + 1}. {item}
-//                 </div>
-
-//                 <div style={{ display: "flex", gap: 8 }}>
-//                   <button onClick={() => moveRank(idx, -1)} disabled={idx === 0}>↑</button>
-//                   <button onClick={() => moveRank(idx, 1)} disabled={idx === rankOrder.length - 1}>↓</button>
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-
-//           <div style={{ marginTop: 20 }}>
-//             <button
-//               onClick={() => submitAnswer(rankOrder)}
-//               style={{ padding: "10px 20px" }}
-//             >
-//               Submit
-//             </button>
-//           </div>
-//         </>
-//       )}
-//     </div>
-//   );
-// }
-
 //newer
 import React, { useState, useEffect, useRef } from "react";
 
@@ -592,57 +5,57 @@ const TASKS = [
   // -----------------------
   // Pairwise Comparison Tasks (single choice)
   // -----------------------
+  // {
+  //   id: 1,
+  //   type: "single",
+  //   question: "Between Vietnam and Taiwan, which sends more international students?",
+  //   options: ["Vietnam", "Taiwan"],
+  //   correct: "Vietnam"
+  // },
+  // {
+  //   id: 1,
+  //   type: "single",
+  //   question: "Between Spain and Turkey/Türkiye, which sends more international students?",
+  //   options: ["Spain", "Turkey/Türkiye"],
+  //   correct: "Turkey/Türkiye"
+  // },
+  // {
+  //   id: 2,
+  //   type: "single",
+  //   question: "Between Nepal and Bangladesh, which sends more international students?",
+  //   options: ["Nepal", "Bangladesh"],
+  //   correct: "Nepal"
+  // },
   {
     id: 1,
-    type: "single",
-    question: "Between Vietnam and Taiwan, which sends more international students?",
-    options: ["Vietnam", "Taiwan"],
-    correct: "Vietnam"
-  },
-  {
-    id: 2,
-    type: "single",
-    question: "Between Spain and Turkey/Türkiye, which sends more international students?",
-    options: ["Spain", "Turkey/Türkiye"],
-    correct: "Turkey/Türkiye"
-  },
-  {
-    id: 3,
-    type: "single",
-    question: "Between Nepal and Bangladesh, which sends more international students?",
-    options: ["Nepal", "Bangladesh"],
-    correct: "Nepal"
-  },
-  {
-    id: 4,
     type: "single",
     question: "Between Hong Kong and Italy, which sends more international students?",
     options: ["Hong Kong", "Italy"],
     correct: "Italy"
   },
+  // {
+  //   id: 5,
+  //   type: "single",
+  //   question: "Between Germany and Spain, which sends more international students?",
+  //   options: ["Germany", "Spain"],
+  //   correct: "Spain"
+  // },
   {
-    id: 5,
-    type: "single",
-    question: "Between Germany and Spain, which sends more international students?",
-    options: ["Germany", "Spain"],
-    correct: "Spain"
-  },
-  {
-    id: 6,
+    id: 2,
     type: "single",
     question: "Between France and Indonesia, which sends more international students?",
     options: ["France", "Indonesia"],
     correct: "Indonesia"
   },
+  // {
+  //   id: 7,
+  //   type: "single",
+  //   question: "Between China and India, which sends more international students?",
+  //   options: ["China", "India"],
+  //   correct: "China"
+  // },
   {
-    id: 7,
-    type: "single",
-    question: "Between China and India, which sends more international students?",
-    options: ["China", "India"],
-    correct: "China"
-  },
-  {
-    id: 8,
+    id: 3,
     type: "single",
     question: "Between Ghana and Iran, which sends more international students?",
     options: ["Ghana", "Iran"],
@@ -653,42 +66,42 @@ const TASKS = [
   // Threshold / Yes-No (single choice)
   // -----------------------
   {
-    id: 9,
+    id: 4,
     type: "single",
     question: "Does Taiwan send more than 30,000 international students to the United States?",
     options: ["Yes", "No"],
     correct: "No"
   },
+  // {
+  //   id: 10,
+  //   type: "single",
+  //   question: "Which country sends more than 60,000 international students to the United States?",
+  //   options: ["China", "Bangladesh"],
+  //   correct: "China"
+  // },
+  // {
+  //   id: 11,
+  //   type: "single",
+  //   question: "Which country sends more than 40,000 international students to the United States?",
+  //   options: ["Iran", "Nigeria", "India"],
+  //   correct: "India"
+  // },
+  // {
+  //   id: 7,
+  //   type: "single",
+  //   question: "Which country sends fewer than 10,000 international students to the United States?",
+  //   options: ["Turkey/Türkiye", "Ghana", "Colombia", "Canada"],
+  //   correct: "Turkey/Türkiye"
+  // },
   {
-    id: 10,
-    type: "single",
-    question: "Which country sends more than 60,000 international students to the United States?",
-    options: ["China", "Bangladesh"],
-    correct: "China"
-  },
-  {
-    id: 11,
-    type: "single",
-    question: "Which country sends more than 40,000 international students to the United States?",
-    options: ["Iran", "Nigeria", "India"],
-    correct: "India"
-  },
-  {
-    id: 12,
-    type: "single",
-    question: "Which country sends fewer than 10,000 international students to the United States?",
-    options: ["Turkey/Türkiye", "Ghana", "Colombia", "Canada"],
-    correct: "Turkey/Türkiye"
-  },
-  {
-    id: 13,
+    id: 5,
     type: "single",
     question: "Which country sends more than 20,000 international students to the United States?",
     options: ["Spain", "United Kingdom", "Nigeria", "Brazil"],
     correct: "Nigeria"
   },
   {
-    id: 14,
+    id: 6,
     type: "single",
     question:
       "Which of the following countries sends fewer than 5,000 international students to the United States?",
@@ -700,7 +113,7 @@ const TASKS = [
   // Ranking-style (single answer)
   // -----------------------
   {
-    id: 15,
+    id: 7,
     type: "single",
     question: "Which country is the fourth highest among the following seven countries?",
     options: ["United Kingdom", "Japan", "Mexico", "France", "India", "Ghana", "Colombia"],
@@ -710,15 +123,15 @@ const TASKS = [
   // -----------------------
   // Pattern Tasks (single choice)
   // -----------------------
+  // {
+  //   id: 16,
+  //   type: "single",
+  //   question: "Which country is closest to the average enrollment level among these three countries?",
+  //   options: ["Vietnam", "Nigera", "Bangladesh"],
+  //   correct: "Nigeria"
+  // },
   {
-    id: 16,
-    type: "single",
-    question: "Which country is closest to the average enrollment level among these three countries?",
-    options: ["Vietnam", "Nigera", "Bangladesh"],
-    correct: "Nigeria"
-  },
-  {
-    id: 17,
+    id: 8,
     type: "single",
     question: "Are high-enrollment countries concentrated in one region or spread across multiple regions?",
     options: ["Mostly Asia", "Mostly Europe", "Evenly spread"],
@@ -729,23 +142,23 @@ const TASKS = [
   // ✅ Ranking tasks (multi-select + ordering)
   // =========================================================
   {
-    id: 18,
+    id: 9,
     type: "top_k",
     question: "From this list of six countries, select the top three by enrollment.",
     options: ["Nepal", "Vietnam", "South Korea", "Canada", "China", "India"],
     k: 3,
     correct: ["South Korea", "China", "India"]
   },
+  // {
+  //   id: 19,
+  //   type: "pick_n",
+  //   question: "Which country is the second lowest among the following ten countries?",
+  //   options: ["Iran", "Japan", "Mexico", "Italy", "Vietnam", "Colombia", "Bangladesh", "France", "Canada", "United Kingdom"],
+  //   n: 2,
+  //   correct: ["Italy", "France"]
+  // },
   {
-    id: 19,
-    type: "pick_n",
-    question: "Which country is the second lowest among the following ten countries?",
-    options: ["Iran", "Japan", "Mexico", "Italy", "Vietnam", "Colombia", "Bangladesh", "France", "Canada", "United Kingdom"],
-    n: 2,
-    correct: ["Italy", "France"]
-  },
-  {
-    id: 20,
+    id: 10,
     type: "full_ranking",
     question: "Rank the following five countries from highest to lowest enrollment.",
     options: ["Brazil", "Turkey/Türkiye", "Saudi Arabia", "Spain", "Taiwan"],
@@ -757,6 +170,16 @@ const TASKS = [
 
 /** Time allowed per question (seconds). */
 const TIME_LIMIT = 60;
+
+/** Fisher-Yates shuffle — returns a new shuffled array. */
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 /** Grade an answer against the task's correct value. Returns true/false. */
 function calcIsCorrect(task, answer) {
@@ -775,7 +198,12 @@ function calcIsCorrect(task, answer) {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
+const VIZ_OPTIONS = ["Ranked Bar Chart", "Choropleth Map"];
+
 export default function Questionnaire() {
+  const [vizCondition, setVizCondition] = useState("");
+  const [started, setStarted] = useState(false);
+
   const [currentTask, setCurrentTask] = useState(0);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [results, setResults] = useState([]);
@@ -790,11 +218,12 @@ export default function Questionnaire() {
   const startedAt = useRef(new Date().toISOString());
   const taskStartTime = useRef(Date.now());   // wall-clock when task began
   const taskTimeLimit = useRef(TIME_LIMIT);   // time limit for current task
+  const shuffledTasks = useRef(shuffleArray([...TASKS])); // randomized once per session
 
   // Reset task-level refs whenever the task index changes
   useEffect(() => {
-    if (currentTask >= TASKS.length) return;
-    const task = TASKS[currentTask];
+    if (currentTask >= shuffledTasks.current.length) return;
+    const task = shuffledTasks.current[currentTask];
 
     taskStartTime.current = Date.now();
     taskTimeLimit.current = TIME_LIMIT;
@@ -805,7 +234,7 @@ export default function Questionnaire() {
 
   // Countdown timer
   useEffect(() => {
-    if (currentTask >= TASKS.length) return;
+    if (currentTask >= shuffledTasks.current.length) return;
 
     if (timeLeft === 0) {
       submitAnswer(null); // auto-submit on timeout
@@ -841,7 +270,7 @@ export default function Questionnaire() {
 
   // ── Record & advance ───────────────────────────────────────────────────────
   const submitAnswer = (answer) => {
-    const task = TASKS[currentTask];
+    const task = shuffledTasks.current[currentTask];
     const timedOut = answer === null;
 
     // Elapsed seconds since the task was shown (1 decimal place)
@@ -867,7 +296,7 @@ export default function Questionnaire() {
     setTimeLeft(TIME_LIMIT);
 
     // If this was the last task, send the dataset to the server
-    if (currentTask + 1 >= TASKS.length) {
+    if (currentTask + 1 >= shuffledTasks.current.length) {
       console.log("Final results:", newResults);
       postResults(newResults);
     }
@@ -894,7 +323,62 @@ export default function Questionnaire() {
     });
   };
 
-  if (currentTask >= TASKS.length) {
+  // ── Intro screen: pick visualization before tasks begin ───────────────────
+  if (!started) {
+    return (
+      <div style={page}>
+        <div style={topBar}>
+          <div style={topInner}>
+            <div style={pill}>
+              <span style={{ color: "#64748b", fontSize: 12, fontWeight: 700 }}>QUESTIONNAIRE</span>
+              <span style={{ fontSize: 16, fontWeight: 900, color: "#0f172a" }}>Before You Begin</span>
+            </div>
+          </div>
+        </div>
+        <div style={centerWrap}>
+          <div style={card}>
+            <div style={taskTag}>Setup</div>
+            <h3 style={question}>Which visualization are you using for this session?</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 8 }}>
+              {VIZ_OPTIONS.map(opt => (
+                <label
+                  key={opt}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 12,
+                    padding: "12px 16px", borderRadius: 14, cursor: "pointer",
+                    border: vizCondition === opt ? "1px solid #60a5fa" : "1px solid #e5e7eb",
+                    background: vizCondition === opt ? "#eff6ff" : "#f8fafc"
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="viz"
+                    value={opt}
+                    checked={vizCondition === opt}
+                    onChange={() => setVizCondition(opt)}
+                    style={{ accentColor: "#2563eb", width: 18, height: 18 }}
+                  />
+                  <span style={{ fontWeight: 700, fontSize: 15 }}>{opt}</span>
+                </label>
+              ))}
+            </div>
+            <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end" }}>
+              <button
+                onClick={() => { startedAt.current = new Date().toISOString(); setStarted(true); }}
+                disabled={!vizCondition}
+                style={{ ...primary, opacity: vizCondition ? 1 : 0.45 }}
+              >
+                Start Tasks →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (currentTask >= shuffledTasks.current.length) {
+    const surveyUrl = `/survey?pid=${encodeURIComponent(participantId.current)}&viz=${encodeURIComponent(vizCondition)}`;
     return (
       <div style={page}>
         <div style={topBar}>
@@ -922,13 +406,29 @@ export default function Questionnaire() {
             <p style={{ ...sub, marginTop: 8, fontSize: 12, color: "#94a3b8" }}>
               Participant ID: {participantId.current}
             </p>
+            <div style={{ marginTop: 20 }}>
+              <a href={surveyUrl}>
+                <button style={{
+                  padding: "12px 24px",
+                  borderRadius: 14,
+                  border: "none",
+                  background: "#2563eb",
+                  color: "#fff",
+                  fontWeight: 900,
+                  fontSize: 15,
+                  cursor: "pointer"
+                }}>
+                  Proceed to Perception & Preference Survey →
+                </button>
+              </a>
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  const task = TASKS[currentTask];
+  const task = shuffledTasks.current[currentTask];
   const type = task.type || "single";
   const urgency = timeLeft <= 5;
 
@@ -945,7 +445,7 @@ export default function Questionnaire() {
           </div>
 
           <div style={{ color: "#64748b", fontSize: 13, fontWeight: 700 }}>
-            Task {currentTask + 1} of {TASKS.length}
+            Task {currentTask + 1} of {shuffledTasks.current.length}
           </div>
         </div>
       </div>
