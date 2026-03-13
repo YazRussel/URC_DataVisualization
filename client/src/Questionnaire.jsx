@@ -775,7 +775,12 @@ function calcIsCorrect(task, answer) {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
+const VIZ_OPTIONS = ["Ranked Bar Chart", "Choropleth Map"];
+
 export default function Questionnaire() {
+  const [vizCondition, setVizCondition] = useState("");
+  const [started, setStarted] = useState(false);
+
   const [currentTask, setCurrentTask] = useState(0);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [results, setResults] = useState([]);
@@ -894,7 +899,62 @@ export default function Questionnaire() {
     });
   };
 
+  // ── Intro screen: pick visualization before tasks begin ───────────────────
+  if (!started) {
+    return (
+      <div style={page}>
+        <div style={topBar}>
+          <div style={topInner}>
+            <div style={pill}>
+              <span style={{ color: "#64748b", fontSize: 12, fontWeight: 700 }}>QUESTIONNAIRE</span>
+              <span style={{ fontSize: 16, fontWeight: 900, color: "#0f172a" }}>Before You Begin</span>
+            </div>
+          </div>
+        </div>
+        <div style={centerWrap}>
+          <div style={card}>
+            <div style={taskTag}>Setup</div>
+            <h3 style={question}>Which visualization are you using for this session?</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 8 }}>
+              {VIZ_OPTIONS.map(opt => (
+                <label
+                  key={opt}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 12,
+                    padding: "12px 16px", borderRadius: 14, cursor: "pointer",
+                    border: vizCondition === opt ? "1px solid #60a5fa" : "1px solid #e5e7eb",
+                    background: vizCondition === opt ? "#eff6ff" : "#f8fafc"
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="viz"
+                    value={opt}
+                    checked={vizCondition === opt}
+                    onChange={() => setVizCondition(opt)}
+                    style={{ accentColor: "#2563eb", width: 18, height: 18 }}
+                  />
+                  <span style={{ fontWeight: 700, fontSize: 15 }}>{opt}</span>
+                </label>
+              ))}
+            </div>
+            <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end" }}>
+              <button
+                onClick={() => { startedAt.current = new Date().toISOString(); setStarted(true); }}
+                disabled={!vizCondition}
+                style={{ ...primary, opacity: vizCondition ? 1 : 0.45 }}
+              >
+                Start Tasks →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (currentTask >= TASKS.length) {
+    const surveyUrl = `/survey?pid=${encodeURIComponent(participantId.current)}&viz=${encodeURIComponent(vizCondition)}`;
     return (
       <div style={page}>
         <div style={topBar}>
@@ -922,6 +982,22 @@ export default function Questionnaire() {
             <p style={{ ...sub, marginTop: 8, fontSize: 12, color: "#94a3b8" }}>
               Participant ID: {participantId.current}
             </p>
+            <div style={{ marginTop: 20 }}>
+              <a href={surveyUrl}>
+                <button style={{
+                  padding: "12px 24px",
+                  borderRadius: 14,
+                  border: "none",
+                  background: "#2563eb",
+                  color: "#fff",
+                  fontWeight: 900,
+                  fontSize: 15,
+                  cursor: "pointer"
+                }}>
+                  Proceed to Perception & Preference Survey →
+                </button>
+              </a>
+            </div>
           </div>
         </div>
       </div>

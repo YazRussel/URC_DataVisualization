@@ -30,6 +30,20 @@ const CSV_HEADER =
 if (!fs.existsSync(CSV_PATH)) {
   fs.writeFileSync(CSV_PATH, CSV_HEADER, "utf-8");
 }
+
+const SURVEY_CSV_PATH = path.join(RESPONSES_DIR, "survey_responses.csv");
+const SURVEY_CSV_HEADER =
+  "participant_id,submitted_at," +
+  "bar_q_a,bar_q_b,bar_q_c,bar_q_d,bar_q_e,bar_q_f," +
+  "choro_q_a,choro_q_b,choro_q_c,choro_q_d,choro_q_e,choro_q_f," +
+  "preferred_visualization,preference_reason\n";
+
+// Recreate if the header has changed (old single-condition format)
+const surveyNeedsReset = fs.existsSync(SURVEY_CSV_PATH) &&
+  !fs.readFileSync(SURVEY_CSV_PATH, "utf-8").startsWith("participant_id,submitted_at,bar_q_a");
+if (!fs.existsSync(SURVEY_CSV_PATH) || surveyNeedsReset) {
+  fs.writeFileSync(SURVEY_CSV_PATH, SURVEY_CSV_HEADER, "utf-8");
+}
 // ──────────────────────────────────────────────────────────────────────────────
 
 function parseTable5() {
@@ -188,6 +202,48 @@ app.delete("/api/responses/:participantId", (req, res) => {
 });
 
 /**
+ * POST /api/survey
+ * Saves one row of perception + preference survey data to survey_responses.csv
+ *
+ * Body:
+ * {
+ *   "participantId": "uuid",
+ *   "submittedAt": "ISO timestamp",
+ *   "visualizationCondition": "Ranked Bar Chart" | "Choropleth Map",
+ *   "likert": { "q_a": 4, "q_b": 3, "q_c": 2, "q_d": 5, "q_e": 1, "q_f": 4 },
+ *   "preferredVisualization": "Ranked Bar Chart",
+ *   "preferenceReason": "..."
+ * }
+ */
+app.post("/api/survey", (req, res) => {
+  try {
+    const { participantId, submittedAt, likertBar, likertChoro, preferredVisualization, preferenceReason } = req.body;
+
+    if (!participantId || !likertBar || !likertChoro) {
+      return res.status(400).json({ ok: false, error: "Invalid payload." });
+    }
+
+    const row = [
+      csvEscape(participantId),
+      csvEscape(submittedAt),
+      likertBar.q_a ?? "", likertBar.q_b ?? "", likertBar.q_c ?? "",
+      likertBar.q_d ?? "", likertBar.q_e ?? "", likertBar.q_f ?? "",
+      likertChoro.q_a ?? "", likertChoro.q_b ?? "", likertChoro.q_c ?? "",
+      likertChoro.q_d ?? "", likertChoro.q_e ?? "", likertChoro.q_f ?? "",
+      csvEscape(preferredVisualization),
+      csvEscape(preferenceReason)
+    ].join(",");
+
+    fs.appendFileSync(SURVEY_CSV_PATH, row + "\n", "utf-8");
+    console.log(`[survey] Saved survey for participant ${participantId}`);
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error("Survey save error:", err);
+    return res.status(500).json({ ok: false, error: "Server error" });
+  }
+});
+
+/**
  * GET /api/responses/export
  * Reads responses.csv and streams a formatted .xlsx file with three sheets:
  *   1. "All Responses"       — every raw row
@@ -315,11 +371,42 @@ app.get("/api/responses/export", (req, res) => {
     { wch: 10 }, { wch: 14 }, { wch: 22 },
   ];
 
+  // ── Sheet 4: Survey Responses ─────────────────────────────────────────────
+  let ws4 = null;
+  if (fs.existsSync(SURVEY_CSV_PATH)) {
+    const surveyRaw = fs.readFileSync(SURVEY_CSV_PATH, "utf-8").trim();
+    const surveyLines = surveyRaw.split("\n");
+    if (surveyLines.length > 1) {
+      const surveyCsvWb = xlsx.read(surveyRaw, { type: "string" });
+      const surveyData = xlsx.utils.sheet_to_json(surveyCsvWb.Sheets[surveyCsvWb.SheetNames[0]]);
+      ws4 = xlsx.utils.json_to_sheet(surveyData);
+      ws4["!cols"] = [
+        { wch: 38 }, // participant_id
+        { wch: 26 }, // submitted_at
+        { wch: 8  }, // bar_q_a
+        { wch: 8  }, // bar_q_b
+        { wch: 8  }, // bar_q_c
+        { wch: 8  }, // bar_q_d
+        { wch: 8  }, // bar_q_e
+        { wch: 8  }, // bar_q_f
+        { wch: 10 }, // choro_q_a
+        { wch: 10 }, // choro_q_b
+        { wch: 10 }, // choro_q_c
+        { wch: 10 }, // choro_q_d
+        { wch: 10 }, // choro_q_e
+        { wch: 10 }, // choro_q_f
+        { wch: 22 }, // preferred_visualization
+        { wch: 60 }, // preference_reason
+      ];
+    }
+  }
+
   // ── Build and send workbook ───────────────────────────────────────────────
   const wb = xlsx.utils.book_new();
   xlsx.utils.book_append_sheet(wb, ws1, "All Responses");
   xlsx.utils.book_append_sheet(wb, ws2, "Summary by Task");
   xlsx.utils.book_append_sheet(wb, ws3, "Summary by Participant");
+  if (ws4) xlsx.utils.book_append_sheet(wb, ws4, "Survey Responses");
 
   const buf = xlsx.write(wb, { type: "buffer", bookType: "xlsx" });
   const filename = `responses-${new Date().toISOString().slice(0, 10)}.xlsx`;
