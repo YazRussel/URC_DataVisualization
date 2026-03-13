@@ -788,9 +788,14 @@ function calcIsCorrect(task, answer) {
 const VIZ_OPTIONS = ["Ranked Bar Chart", "Choropleth Map"];
 
 export default function Questionnaire() {
-  const [vizCondition, setVizCondition] = useState("");
-  const [started, setStarted] = useState(false);
+  // ── Phase & condition ──────────────────────────────────────────────────────
+  // Flow: "intro" → "running" → "between" → "running" (cond. 2) → "complete"
+  const [phase, setPhase] = useState("intro");
+  const [conditionIndex, setConditionIndex] = useState(0); // 0 = first, 1 = second
+  // vizOrder[0] = chosen first viz; vizOrder[1] = auto-assigned second viz
+  const [vizOrder, setVizOrder] = useState(["", ""]);
 
+  // ── Task state (reset between conditions) ─────────────────────────────────
   const [currentTask, setCurrentTask] = useState(0);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [results, setResults] = useState([]);
@@ -800,56 +805,61 @@ export default function Questionnaire() {
   const [multiSelected, setMultiSelected] = useState([]);
   const [rankOrder, setRankOrder] = useState([]);
 
-  // ── Dataset tracking refs ──────────────────────────────────────────────────
-  const participantId = useRef(crypto.randomUUID());
-  const startedAt = useRef(new Date().toISOString());
-  const taskStartTime = useRef(Date.now());   // wall-clock when task began
-  const taskTimeLimit = useRef(TIME_LIMIT);   // time limit for current task
-  const shuffledTasks = useRef(shuffleArray([...TASKS])); // randomized once per session
+  // ── Refs ───────────────────────────────────────────────────────────────────
+  const [participantId, setParticipantId] = useState("");
+  const startedAt = useRef(null);
+  const taskStartTime = useRef(Date.now());
+  const taskTimeLimit = useRef(TIME_LIMIT);
+  // Two independently shuffled task lists — one per condition
+  const shuffledTasks = useRef([
+    shuffleArray([...TASKS]),
+    shuffleArray([...TASKS]),
+  ]);
 
-  // Reset task-level refs whenever the task index changes
+  // Current condition's task list
+  const currentTasks = shuffledTasks.current[conditionIndex];
+
+  // ── Reset task refs when task changes ─────────────────────────────────────
   useEffect(() => {
-    if (currentTask >= shuffledTasks.current.length) return;
-    const task = shuffledTasks.current[currentTask];
-
+    if (phase !== "running") return;
+    if (currentTask >= currentTasks.length) return;
+    const task = currentTasks[currentTask];
     taskStartTime.current = Date.now();
     taskTimeLimit.current = TIME_LIMIT;
-
     if (task.type === "top_k" || task.type === "pick_n") setMultiSelected([]);
     if (task.type === "full_ranking") setRankOrder(task.options);
-  }, [currentTask]);
+  }, [currentTask, conditionIndex, phase]);
 
-  // Countdown timer
+  // ── Countdown timer ────────────────────────────────────────────────────────
   useEffect(() => {
-    if (currentTask >= shuffledTasks.current.length) return;
-
+    if (phase !== "running") return;
+    if (currentTask >= currentTasks.length) return;
     if (timeLeft === 0) {
-      submitAnswer(null); // auto-submit on timeout
+      submitAnswer(null);
       return;
     }
-
     const timer = setTimeout(() => setTimeLeft(t => t - 1), 1000);
     return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timeLeft, currentTask]);
+  }, [timeLeft, currentTask, phase]);
 
   // ── POST results to server ─────────────────────────────────────────────────
-  const postResults = async (allResults) => {
+  const postResults = async (allResults, vizCondition) => {
     setSaveStatus("saving");
     try {
       const res = await fetch("/api/responses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          participantId: participantId.current,
+          participantId: participantId,
+          vizCondition,
           startedAt: startedAt.current,
           finishedAt: new Date().toISOString(),
           results: allResults
         })
       });
       const data = await res.json();
-      if (data.ok) setSaveStatus("saved");
-      else setSaveStatus("error");
+      setSaveStatus(data.ok ? "saved" : "error");
     } catch {
       setSaveStatus("error");
     }
@@ -857,13 +867,9 @@ export default function Questionnaire() {
 
   // ── Record & advance ───────────────────────────────────────────────────────
   const submitAnswer = (answer) => {
-    const task = shuffledTasks.current[currentTask];
+    const task = currentTasks[currentTask];
     const timedOut = answer === null;
-
-    // Elapsed seconds since the task was shown (1 decimal place)
-    const reactionTimeS = +(
-      (Date.now() - taskStartTime.current) / 1000
-    ).toFixed(1);
+    const reactionTimeS = +((Date.now() - taskStartTime.current) / 1000).toFixed(1);
 
     const result = {
       taskId:         task.id,
@@ -878,14 +884,26 @@ export default function Questionnaire() {
     };
 
     const newResults = [...results, result];
-    setResults(newResults);
-    setCurrentTask(prev => prev + 1);
-    setTimeLeft(TIME_LIMIT);
+    const isLast = currentTask + 1 >= currentTasks.length;
 
-    // If this was the last task, send the dataset to the server
-    if (currentTask + 1 >= shuffledTasks.current.length) {
-      console.log("Final results:", newResults);
-      postResults(newResults);
+    if (isLast) {
+      console.log(`Condition ${conditionIndex + 1} (${vizOrder[conditionIndex]}) results:`, newResults);
+      postResults(newResults, vizOrder[conditionIndex]);
+      if (conditionIndex === 0) {
+        // Reset task state and show between-conditions screen
+        setCurrentTask(0);
+        setTimeLeft(TIME_LIMIT);
+        setResults([]);
+        setPhase("between");
+      } else {
+        // Both conditions done
+        setResults(newResults);
+        setPhase("complete");
+      }
+    } else {
+      setResults(newResults);
+      setCurrentTask(prev => prev + 1);
+      setTimeLeft(TIME_LIMIT);
     }
   };
 
@@ -910,8 +928,9 @@ export default function Questionnaire() {
     });
   };
 
-  // ── Intro screen: pick visualization before tasks begin ───────────────────
-  if (!started) {
+  // ── Intro screen ───────────────────────────────────────────────────────────
+  if (phase === "intro") {
+    const selectedViz = vizOrder[0];
     return (
       <div style={page}>
         <div style={topBar}>
@@ -925,7 +944,26 @@ export default function Questionnaire() {
         <div style={centerWrap}>
           <div style={card}>
             <div style={taskTag}>Setup</div>
-            <h3 style={question}>Which visualization are you using for this session?</h3>
+
+            {/* Participant ID input */}
+            <h3 style={question}>Participant ID</h3>
+            <p style={helper}>Enter the participant number assigned by the experimenter.</p>
+            <input
+              type="text"
+              value={participantId}
+              onChange={e => setParticipantId(e.target.value)}
+              placeholder="e.g. 1, 2, P001 …"
+              style={{
+                width: "100%", boxSizing: "border-box",
+                padding: "10px 14px", borderRadius: 12, fontSize: 15,
+                border: "1px solid #e5e7eb", outline: "none",
+                fontFamily: "inherit"
+              }}
+            />
+
+            {/* Visualization selector */}
+            <h3 style={{ ...question, marginTop: 24 }}>Which visualization are you starting with?</h3>
+            <p style={helper}>You will answer questions on both visualizations. Select the one you have open right now.</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 8 }}>
               {VIZ_OPTIONS.map(opt => (
                 <label
@@ -933,16 +971,16 @@ export default function Questionnaire() {
                   style={{
                     display: "flex", alignItems: "center", gap: 12,
                     padding: "12px 16px", borderRadius: 14, cursor: "pointer",
-                    border: vizCondition === opt ? "1px solid #60a5fa" : "1px solid #e5e7eb",
-                    background: vizCondition === opt ? "#eff6ff" : "#f8fafc"
+                    border: selectedViz === opt ? "1px solid #60a5fa" : "1px solid #e5e7eb",
+                    background: selectedViz === opt ? "#eff6ff" : "#f8fafc"
                   }}
                 >
                   <input
                     type="radio"
                     name="viz"
                     value={opt}
-                    checked={vizCondition === opt}
-                    onChange={() => setVizCondition(opt)}
+                    checked={selectedViz === opt}
+                    onChange={() => setVizOrder([opt, VIZ_OPTIONS.find(v => v !== opt)])}
                     style={{ accentColor: "#2563eb", width: 18, height: 18 }}
                   />
                   <span style={{ fontWeight: 700, fontSize: 15 }}>{opt}</span>
@@ -951,9 +989,9 @@ export default function Questionnaire() {
             </div>
             <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end" }}>
               <button
-                onClick={() => { startedAt.current = new Date().toISOString(); setStarted(true); }}
-                disabled={!vizCondition}
-                style={{ ...primary, opacity: vizCondition ? 1 : 0.45 }}
+                onClick={() => { startedAt.current = new Date().toISOString(); setPhase("running"); }}
+                disabled={!selectedViz || !participantId.trim()}
+                style={{ ...primary, opacity: (selectedViz && participantId.trim()) ? 1 : 0.45 }}
               >
                 Start Tasks →
               </button>
@@ -964,8 +1002,52 @@ export default function Questionnaire() {
     );
   }
 
-  if (currentTask >= shuffledTasks.current.length) {
-    const surveyUrl = `/survey?pid=${encodeURIComponent(participantId.current)}&viz=${encodeURIComponent(vizCondition)}`;
+  // ── Between-conditions screen ──────────────────────────────────────────────
+  if (phase === "between") {
+    return (
+      <div style={page}>
+        <div style={topBar}>
+          <div style={topInner}>
+            <div style={pill}>
+              <span style={{ color: "#64748b", fontSize: 12, fontWeight: 700 }}>QUESTIONNAIRE</span>
+              <span style={{ fontSize: 16, fontWeight: 900, color: "#0f172a" }}>Condition 1 of 2 Complete</span>
+            </div>
+          </div>
+        </div>
+        <div style={centerWrap}>
+          <div style={card}>
+            <h2 style={title}>Condition 1 Done!</h2>
+            <p style={sub}>You've finished the <b>{vizOrder[0]}</b> tasks.</p>
+            {saveStatus === "saving" && <p style={{ ...sub, marginTop: 10, color: "#64748b" }}>Saving responses…</p>}
+            {saveStatus === "saved"  && <p style={{ ...sub, marginTop: 10, color: "#16a34a" }}>✓ Responses saved.</p>}
+            {saveStatus === "error"  && <p style={{ ...sub, marginTop: 10, color: "#dc2626" }}>⚠ Could not reach the server.</p>}
+            <div style={{ marginTop: 20, padding: "16px 18px", borderRadius: 14, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+              <p style={{ margin: 0, fontWeight: 700, color: "#1d4ed8", fontSize: 15 }}>
+                Next: please switch to the <b>{vizOrder[1]}</b> visualization, then click Continue.
+              </p>
+            </div>
+            <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end" }}>
+              <button
+                onClick={() => {
+                  startedAt.current = new Date().toISOString();
+                  setConditionIndex(1);
+                  setSaveStatus("idle");
+                  setPhase("running");
+                }}
+                style={primary}
+              >
+                Continue to Condition 2 →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Complete screen (both conditions done) ─────────────────────────────────
+  if (phase === "complete") {
+    const surveyUrl = `/survey?pid=${encodeURIComponent(participantId)}`;
     return (
       <div style={page}>
         <div style={topBar}>
@@ -975,23 +1057,19 @@ export default function Questionnaire() {
         </div>
         <div style={centerWrap}>
           <div style={card}>
-            <h2 style={title}>Experiment Complete</h2>
-            <p style={sub}>Thank you for participating!</p>
+            <h2 style={title}>Experiment Complete!</h2>
+            <p style={sub}>You've finished both visualization conditions. Thank you!</p>
             {saveStatus === "saving" && (
               <p style={{ ...sub, marginTop: 12, color: "#64748b" }}>Saving your responses…</p>
             )}
             {saveStatus === "saved" && (
-              <p style={{ ...sub, marginTop: 12, color: "#16a34a" }}>
-                ✓ Responses saved to the dataset.
-              </p>
+              <p style={{ ...sub, marginTop: 12, color: "#16a34a" }}>✓ Responses saved to the dataset.</p>
             )}
             {saveStatus === "error" && (
-              <p style={{ ...sub, marginTop: 12, color: "#dc2626" }}>
-                ⚠ Could not reach the server. Results are logged to the console.
-              </p>
+              <p style={{ ...sub, marginTop: 12, color: "#dc2626" }}>⚠ Could not reach the server. Results are logged to the console.</p>
             )}
             <p style={{ ...sub, marginTop: 8, fontSize: 12, color: "#94a3b8" }}>
-              Participant ID: {participantId.current}
+              Participant ID: {participantId}
             </p>
             <div style={{ marginTop: 20 }}>
               <a href={surveyUrl}>
@@ -1015,13 +1093,13 @@ export default function Questionnaire() {
     );
   }
 
-  const task = shuffledTasks.current[currentTask];
+  // ── Task screen ────────────────────────────────────────────────────────────
+  const task = currentTasks[currentTask];
   const type = task.type || "single";
   const urgency = timeLeft <= 5;
 
   return (
     <div style={page}>
-      {/* Top timer bar */}
       <div style={topBar}>
         <div style={topInner}>
           <div style={pill}>
@@ -1030,9 +1108,13 @@ export default function Questionnaire() {
               {timeLeft}s
             </span>
           </div>
-
-          <div style={{ color: "#64748b", fontSize: 13, fontWeight: 700 }}>
-            Task {currentTask + 1} of {shuffledTasks.current.length}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
+            <div style={{ color: "#64748b", fontSize: 11, fontWeight: 700 }}>
+              {vizOrder[conditionIndex]} · Condition {conditionIndex + 1} of 2
+            </div>
+            <div style={{ color: "#64748b", fontSize: 13, fontWeight: 700 }}>
+              Task {currentTask + 1} of {currentTasks.length}
+            </div>
           </div>
         </div>
       </div>
@@ -1040,7 +1122,7 @@ export default function Questionnaire() {
       {/* Centered content */}
       <div style={centerWrap}>
         <div style={card}>
-          <div style={taskTag}>Question #{task.id}</div>
+          <div style={taskTag}>Question #{String(task.id).padStart(2, "0")}</div>
           <h3 style={question}>{task.question}</h3>
 
           {/* SINGLE */}

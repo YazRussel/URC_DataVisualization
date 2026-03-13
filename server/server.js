@@ -23,11 +23,16 @@ if (!fs.existsSync(RESPONSES_DIR)) {
 
 const CSV_PATH = path.join(RESPONSES_DIR, "responses.csv");
 const CSV_HEADER =
-  "participant_id,session_started_at,session_finished_at," +
+  "participant_id,session_started_at,session_finished_at,viz_condition," +
   "task_id,task_type,question,selected_answer,correct_answer," +
   "is_correct,reaction_time_s,timed_out,time_limit_s\n";
 
-if (!fs.existsSync(CSV_PATH)) {
+// Recreate if old header (missing viz_condition)
+const responsesNeedsReset = fs.existsSync(CSV_PATH) &&
+  !fs.readFileSync(CSV_PATH, "utf-8").startsWith(
+    "participant_id,session_started_at,session_finished_at,viz_condition"
+  );
+if (!fs.existsSync(CSV_PATH) || responsesNeedsReset) {
   fs.writeFileSync(CSV_PATH, CSV_HEADER, "utf-8");
 }
 
@@ -118,7 +123,7 @@ const csvEscape = (val) => {
  */
 app.post("/api/responses", (req, res) => {
   try {
-    const { participantId, startedAt, finishedAt, results } = req.body;
+    const { participantId, vizCondition, startedAt, finishedAt, results } = req.body;
 
     if (!participantId || !Array.isArray(results)) {
       return res.status(400).json({
@@ -140,6 +145,7 @@ app.post("/api/responses", (req, res) => {
         csvEscape(participantId),
         csvEscape(startedAt),
         csvEscape(finishedAt),
+        csvEscape(vizCondition ?? ""),
         r.taskId,
         csvEscape(r.type),
         csvEscape(r.question),
@@ -271,6 +277,7 @@ app.get("/api/responses/export", (req, res) => {
     { wch: 38 }, // participant_id
     { wch: 26 }, // session_started_at
     { wch: 26 }, // session_finished_at
+    { wch: 22 }, // viz_condition
     { wch: 8  }, // task_id
     { wch: 14 }, // task_type
     { wch: 72 }, // question
