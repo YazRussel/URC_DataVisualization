@@ -758,6 +758,16 @@ const TASKS = [
 /** Time allowed per question (seconds). */
 const TIME_LIMIT = 60;
 
+/** Fisher-Yates shuffle — returns a new shuffled array. */
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 /** Grade an answer against the task's correct value. Returns true/false. */
 function calcIsCorrect(task, answer) {
   if (answer === null) return false; // timed out counts as wrong
@@ -795,11 +805,12 @@ export default function Questionnaire() {
   const startedAt = useRef(new Date().toISOString());
   const taskStartTime = useRef(Date.now());   // wall-clock when task began
   const taskTimeLimit = useRef(TIME_LIMIT);   // time limit for current task
+  const shuffledTasks = useRef(shuffleArray([...TASKS])); // randomized once per session
 
   // Reset task-level refs whenever the task index changes
   useEffect(() => {
-    if (currentTask >= TASKS.length) return;
-    const task = TASKS[currentTask];
+    if (currentTask >= shuffledTasks.current.length) return;
+    const task = shuffledTasks.current[currentTask];
 
     taskStartTime.current = Date.now();
     taskTimeLimit.current = TIME_LIMIT;
@@ -810,7 +821,7 @@ export default function Questionnaire() {
 
   // Countdown timer
   useEffect(() => {
-    if (currentTask >= TASKS.length) return;
+    if (currentTask >= shuffledTasks.current.length) return;
 
     if (timeLeft === 0) {
       submitAnswer(null); // auto-submit on timeout
@@ -846,7 +857,7 @@ export default function Questionnaire() {
 
   // ── Record & advance ───────────────────────────────────────────────────────
   const submitAnswer = (answer) => {
-    const task = TASKS[currentTask];
+    const task = shuffledTasks.current[currentTask];
     const timedOut = answer === null;
 
     // Elapsed seconds since the task was shown (1 decimal place)
@@ -872,7 +883,7 @@ export default function Questionnaire() {
     setTimeLeft(TIME_LIMIT);
 
     // If this was the last task, send the dataset to the server
-    if (currentTask + 1 >= TASKS.length) {
+    if (currentTask + 1 >= shuffledTasks.current.length) {
       console.log("Final results:", newResults);
       postResults(newResults);
     }
@@ -953,7 +964,7 @@ export default function Questionnaire() {
     );
   }
 
-  if (currentTask >= TASKS.length) {
+  if (currentTask >= shuffledTasks.current.length) {
     const surveyUrl = `/survey?pid=${encodeURIComponent(participantId.current)}&viz=${encodeURIComponent(vizCondition)}`;
     return (
       <div style={page}>
@@ -1004,7 +1015,7 @@ export default function Questionnaire() {
     );
   }
 
-  const task = TASKS[currentTask];
+  const task = shuffledTasks.current[currentTask];
   const type = task.type || "single";
   const urgency = timeLeft <= 5;
 
@@ -1021,7 +1032,7 @@ export default function Questionnaire() {
           </div>
 
           <div style={{ color: "#64748b", fontSize: 13, fontWeight: 700 }}>
-            Task {currentTask + 1} of {TASKS.length}
+            Task {currentTask + 1} of {shuffledTasks.current.length}
           </div>
         </div>
       </div>
