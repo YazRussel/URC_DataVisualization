@@ -1,45 +1,3 @@
-// //newer
-// import React from "react";
-
-// export default function App() {
-//   const openExperiment = () => {
-//     window.open(
-//       "http://localhost:5173/experiment",
-//       "_blank",
-//       "width=1200,height=800"
-//     );
-//   };
-
-//   return (
-//     <div style={{ padding: "50px" }}>
-//       <h1>Experiment Launcher</h1>
-//       <button onClick={openExperiment}>
-//         Start Experiment
-//       </button>
-//     </div>
-//   );
-// }
-
-
-
-//new
-// import React from "react";
-// import Experiment from "./Experiment";
-
-// export default function App() {
-//   return <Experiment />;
-// }
-
-// old one
-// import RankedBarChart from "./RankedBarChart";
-
-// function App() {
-//   return <RankedBarChart />;
-// }
-
-// export default App;
-
-
 import React from "react";
 import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
 
@@ -133,7 +91,7 @@ function Home({ openChart, openChoropleth, openQuestionnaire, openSurvey }) {
           </button>
         </a>
 
-        <button
+        {/*<button
           onClick={() => {
             if (window.confirm("Delete ALL responses? This cannot be undone.")) {
               fetch("/api/responses/all", { method: "DELETE" })
@@ -154,7 +112,7 @@ function Home({ openChart, openChoropleth, openQuestionnaire, openSurvey }) {
           }}
         >
           Clear All Responses
-        </button>
+        </button> */}
       </div>
     </div>
   );

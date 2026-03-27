@@ -592,160 +592,156 @@ const TASKS = [
   // -----------------------
   // Pairwise Comparison Tasks (single choice)
   // -----------------------
+  // {
+  //   id: 1,
+  //   type: "single",
+  //   question: "Between Vietnam and Taiwan, which sends more international students?",
+  //   options: ["Vietnam", "Taiwan"],
+  //   correct: "Vietnam"
+  // },
+  // {
+  //   id: 1,
+  //   type: "single",
+  //   question: "Between Spain and Turkey/Türkiye, which sends more international students?",
+  //   options: ["Spain", "Turkey/Türkiye"],
+  //   correct: "Turkey/Türkiye"
+  // },
+  // {
+  //   id: 2,
+  //   type: "single",
+  //   question: "Between Nepal and Bangladesh, which sends more international students?",
+  //   options: ["Nepal", "Bangladesh"],
+  //   correct: "Nepal"
+  // },
   {
     id: 1,
-    type: "single",
-    question: "Between Vietnam and Taiwan, which sends more international students?",
-    options: ["Vietnam", "Taiwan"],
-    correct: "Vietnam"
-  },
-  {
-    id: 2,
-    type: "single",
-    question: "Between Spain and Turkey/Türkiye, which sends more international students?",
-    options: ["Spain", "Turkey/Türkiye"],
-    correct: "Turkey/Türkiye"
-  },
-  {
-    id: 3,
-    type: "single",
-    question: "Between Nepal and Bangladesh, which sends more international students?",
-    options: ["Nepal", "Bangladesh"],
-    correct: "Nepal"
-  },
-  {
-    id: 4,
     type: "single",
     question: "Between Hong Kong and Italy, which sends more international students?",
     options: ["Hong Kong", "Italy"],
     correct: "Italy"
   },
+  // {
+  //   id: 5,
+  //   type: "single",
+  //   question: "Between Germany and Spain, which sends more international students?",
+  //   options: ["Germany", "Spain"],
+  //   correct: "Spain"
+  // },
   {
-    id: 5,
-    type: "single",
-    question: "Between Germany and Spain, which sends more international students?",
-    options: ["Germany", "Spain"],
-    correct: "Spain"
-  },
-  {
-    id: 6,
+    id: 2,
     type: "single",
     question: "Between France and Indonesia, which sends more international students?",
     options: ["France", "Indonesia"],
-    correct: "Indonesia"
+    correct: "France"
   },
+  // {
+  //   id: 7,
+  //   type: "single",
+  //   question: "Between China and India, which sends more international students?",
+  //   options: ["China", "India"],
+  //   correct: "India"
+  // },
   {
-    id: 7,
-    type: "single",
-    question: "Between China and India, which sends more international students?",
-    options: ["China", "India"],
-    correct: "China"
-  },
-  {
-    id: 8,
+    id: 3,
     type: "single",
     question: "Between Ghana and Iran, which sends more international students?",
     options: ["Ghana", "Iran"],
     correct: "Ghana"
   },
-
   // -----------------------
   // Threshold / Yes-No (single choice)
   // -----------------------
   {
-    id: 9,
+    id: 4,
     type: "single",
     question: "Does Taiwan send more than 30,000 international students to the United States?",
     options: ["Yes", "No"],
     correct: "No"
   },
+  // {
+  //   id: 10,
+  //   type: "single",
+  //   question: "Which country sends more than 60,000 international students to the United States?",
+  //   options: ["China", "Bangladesh"],
+  //   correct: "China"
+  // },
+  // {
+  //   id: 11,
+  //   type: "single",
+  //   question: "Which country sends more than 40,000 international students to the United States?",
+  //   options: ["Iran", "Nigeria", "India"],
+  //   correct: "India"
+  // },
+  // {
+  //   id: 7,
+  //   type: "single",
+  //   question: "Which country sends fewer than 10,000 international students to the United States?",
+  //   options: ["Turkey/Türkiye", "Ghana", "Colombia", "Canada"],
+  //   correct: "Turkey/Türkiye"
+  // },
   {
-    id: 10,
-    type: "single",
-    question: "Which country sends more than 60,000 international students to the United States?",
-    options: ["China", "Bangladesh"],
-    correct: "China"
-  },
-  {
-    id: 11,
-    type: "single",
-    question: "Which country sends more than 40,000 international students to the United States?",
-    options: ["Iran", "Nigeria", "India"],
-    correct: "India"
-  },
-  {
-    id: 12,
-    type: "single",
-    question: "Which country sends fewer than 10,000 international students to the United States?",
-    options: ["Turkey/Türkiye", "Ghana", "Colombia", "Canada"],
-    correct: "Turkey/Türkiye"
-  },
-  {
-    id: 13,
+    id: 5,
     type: "single",
     question: "Which country sends more than 20,000 international students to the United States?",
     options: ["Spain", "United Kingdom", "Nigeria", "Brazil"],
     correct: "Nigeria"
   },
   {
-    id: 14,
+    id: 6,
     type: "single",
     question:
       "Which of the following countries sends fewer than 5,000 international students to the United States?",
     options: ["Mexico", "France", "Iran", "None"],
     correct: "None"
   },
-
   // -----------------------
   // Ranking-style (single answer)
   // -----------------------
   {
-    id: 15,
+    id: 7,
     type: "single",
-    question: "Which country is the fourth highest among the following seven countries?",
-    options: ["United Kingdom", "Japan", "Mexico", "France", "India", "Ghana", "Colombia"],
-    correct: "United Kingdom"
+    question: "Which country is the second highest among the following four countries?",
+    options: ["United Kingdom", "Japan", "Mexico", "France"],
+    correct: "Japan"
   },
-
   // -----------------------
   // Pattern Tasks (single choice)
   // -----------------------
+  // {
+  //   id: 16,
+  //   type: "single",
+  //   question: "Which country is closest to the average enrollment level among these three countries?",
+  //   options: ["Vietnam", "Nigera", "Bangladesh"],
+  //   correct: "Nigeria"
+  // },
   {
-    id: 16,
-    type: "single",
-    question: "Which country is closest to the average enrollment level among these three countries?",
-    options: ["Vietnam", "Nigera", "Bangladesh"],
-    correct: "Nigeria"
-  },
-  {
-    id: 17,
+    id: 8,
     type: "single",
     question: "Are high-enrollment countries concentrated in one region or spread across multiple regions?",
     options: ["Mostly Asia", "Mostly Europe", "Evenly spread"],
     correct: "Mostly Asia"
   },
-
   // =========================================================
   // ✅ Ranking tasks (multi-select + ordering)
   // =========================================================
   {
-    id: 18,
+    id: 9,
     type: "top_k",
     question: "From this list of six countries, select the top three by enrollment.",
     options: ["Nepal", "Vietnam", "South Korea", "Canada", "China", "India"],
     k: 3,
     correct: ["South Korea", "China", "India"]
   },
+  // {
+  //   id: 19,
+  //   type: "pick_n",
+  //   question: "Which country is the second lowest among the following ten countries?",
+  //   options: ["Iran", "Japan", "Mexico", "Italy", "Vietnam", "Colombia", "Bangladesh", "France", "Canada", "United Kingdom"],
+  //   n: 2,
+  //   correct: ["Italy", "France"]
+  // },
   {
-    id: 19,
-    type: "pick_n",
-    question: "Which country is the second lowest among the following ten countries?",
-    options: ["Iran", "Japan", "Mexico", "Italy", "Vietnam", "Colombia", "Bangladesh", "France", "Canada", "United Kingdom"],
-    n: 2,
-    correct: ["Italy", "France"]
-  },
-  {
-    id: 20,
+    id: 10,
     type: "full_ranking",
     question: "Rank the following five countries from highest to lowest enrollment.",
     options: ["Brazil", "Turkey/Türkiye", "Saudi Arabia", "Spain", "Taiwan"],

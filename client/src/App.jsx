@@ -133,7 +133,7 @@ function Home({ openChart, openChoropleth, openQuestionnaire, openSurvey }) {
           </button>
         </a>
 
-        <button
+        {/* <button
           onClick={() => {
             if (window.confirm("Delete ALL responses? This cannot be undone.")) {
               fetch("/api/responses/all", { method: "DELETE" })
@@ -154,7 +154,7 @@ function Home({ openChart, openChoropleth, openQuestionnaire, openSurvey }) {
           }}
         >
           Clear All Responses
-        </button>
+        </button> */}
       </div>
     </div>
   );
