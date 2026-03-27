@@ -357,21 +357,21 @@ export default function RankedBarChart() {
             bargap: 0.3,
             xaxis: {
               title: showPercent ? "Percentage (%)" : "Number of Students",
-              fixedrange: true,
+              fixedrange: false,
               zeroline: false,
               gridcolor: "#e5e7eb"
             },
             yaxis: {
               automargin: true,
-              fixedrange: true
+              fixedrange: false
             },
             paper_bgcolor: "#ffffff",
             plot_bgcolor: "#ffffff",
             font: { family: "Inter, Arial", size: 14 }
           }}
           config={{
-            displayModeBar: false,
-            scrollZoom: false,
+            displayModeBar: true,
+            scrollZoom: true,
             displaylogo: false,
             responsive: true
           }}
